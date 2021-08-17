@@ -1,6 +1,5 @@
-import 'package:coba_shelf/utils/auth.dart';
+import 'package:coba_shelf/utils/app_middleware.dart';
 import 'package:shelf/shelf.dart';
-import 'package:sqlite3/sqlite3.dart';
 
 enum Roles {
   Admin,

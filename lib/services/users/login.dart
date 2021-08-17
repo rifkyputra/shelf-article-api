@@ -18,12 +18,12 @@ class LoginApi {
   Router get router {
     final route = Router();
 
-    route.post('/', loginController);
+    route.post('/', _loginController);
 
     return route;
   }
 
-  Future loginController(Request request) async {
+  Future _loginController(Request request) async {
     final rawBody = await request.readAsString();
     final body = jsonDecode(rawBody);
 
