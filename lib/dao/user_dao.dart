@@ -4,6 +4,8 @@ import 'package:coba_shelf/db/base_db.dart';
 class UserDao extends DriverHolder implements BaseDao {
   UserDao({required BaseDbDriver db}) : super(db: db);
 
+  static const tableName = 'users';
+
   @override
   BaseDbDriver get db => super.db;
 
@@ -13,8 +15,14 @@ class UserDao extends DriverHolder implements BaseDao {
   }
 
   @override
-  Future getAll() {
-    throw UnimplementedError();
+  Future getAll() async {
+    final query = await db.select();
+
+    if (query == null || query.isNotEmpty) {
+      return [];
+    }
+
+    return query;
   }
 
   @override

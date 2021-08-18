@@ -4,7 +4,10 @@ import 'package:sqlite3/sqlite3.dart';
 class SqliteDB implements BaseDbDriver {
   final Database db;
 
-  SqliteDB(this.db);
+  @override
+  final String table;
+
+  SqliteDB({required this.db, required this.table});
 
   @override
   Future delete({covariant id}) {
@@ -19,9 +22,19 @@ class SqliteDB implements BaseDbDriver {
   }
 
   @override
-  Future select({covariant arg}) {
-    // TODO: implement select
-    throw UnimplementedError();
+  Future select({
+    List? columns,
+  }) async {
+    var selection = '*';
+
+    if (columns != null) {
+      selection = '';
+      columns.forEach((element) => selection = '$selection, $element');
+    }
+
+    final query = db.select('select $selection from $table');
+
+    return query;
   }
 
   @override
@@ -31,6 +44,12 @@ class SqliteDB implements BaseDbDriver {
   }
 
   Future execute() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future selectWhere({covariant arg}) {
+    // TODO: implement selectWhere
     throw UnimplementedError();
   }
 }
