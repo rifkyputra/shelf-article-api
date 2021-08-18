@@ -16,20 +16,25 @@ class SqliteDB implements BaseDbDriver {
   }
 
   @override
-  Future insert({covariant data}) {
-    // TODO: implement insert
-    throw UnimplementedError();
+  Future insert({Map data}) {
+    final query = db.execute('INSERT INTO $table values(?)',data.entries.map((e) => e.first.value));
   }
 
   @override
   Future select({
     List? columns,
+    Map where,
   }) async {
     var selection = '*';
+    var whereClause = '';
 
     if (columns != null) {
       selection = '';
       columns.forEach((element) => selection = '$selection, $element');
+    }
+
+    if(where != null ) {
+      whereClause = 'WHERE ${where.entries.first.key}=${where.entries.first.value}'; 
     }
 
     final query = db.select('select $selection from $table');
@@ -43,13 +48,8 @@ class SqliteDB implements BaseDbDriver {
     throw UnimplementedError();
   }
 
-  Future execute() {
-    throw UnimplementedError();
+  Future execute(String query) {
+    await db.execute(query);
   }
 
-  @override
-  Future selectWhere({covariant arg}) {
-    // TODO: implement selectWhere
-    throw UnimplementedError();
-  }
 }
