@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:coba_shelf/dao/user_dao.dart';
+import 'package:coba_shelf/db/base_db.dart';
 import 'package:crypto/crypto.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:sqlite3/sqlite3.dart';
 import 'package:coba_shelf/const.dart' as constant;
 
 class RegisterApi {
-  final Database db;
+  final BaseDbDriver db;
 
   RegisterApi({required this.db});
+
+  UserDao get userDao => UserDao(db: db);
 
   Router get router {
     final route = Router();
@@ -34,7 +37,7 @@ class RegisterApi {
       );
     }
     final userExist =
-        db.select('select email from users where email=(?)', [email]);
+        await userDao.getByEmail(email: email, columns: ['email']);
 
     if (userExist.isNotEmpty) {
       return Response(HttpStatus.badRequest, body: 'Email already registered');
@@ -47,11 +50,16 @@ class RegisterApi {
     final digestPassword = hmacSha256.convert(salt);
 
     try {
-      db.execute(
-        'insert into users (email, password) values(?,?)',
-        [email, digestPassword.toString()],
-      );
-    } catch (e) {
+      // db.execute(
+      //   'insert into users (email, password) values(?,?)',
+      //   [email, digestPassword.toString()],
+      // );
+      await userDao.insert(data: {
+        'email': email,
+        'password': digestPassword.toString(),
+      });
+    } catch (e, s) {
+      print(s);
       return Response.internalServerError(body: e);
 
       ///

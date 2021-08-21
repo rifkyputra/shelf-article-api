@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:coba_shelf/db/base_db.dart';
+import 'package:coba_shelf/db/sqlite_db.dart';
 import 'package:coba_shelf/middleware/auth.dart';
+import 'package:coba_shelf/services/article/article.dart';
 import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -24,14 +27,19 @@ const secret = constant.secret;
 void main(List<String> args) async {
   open.overrideFor(OperatingSystem.linux, _openOnWindows);
   final db = sqlite3.open('db.db');
+  final sqlite = SqliteDB(db: db);
 
   var app = Router();
 
-  app.mount('/register/', RegisterApi(db: db).router);
+  app.mount('/register/', RegisterApi(db: sqlite).router);
 
   app.mount('/login/', LoginApi(db: db).router);
 
-  app.mount('/users/', UsersApi().router);
+  app.mount('/users/', UsersApi(db: sqlite).router);
+
+  app.mount('/article/', ArticleApi(db: sqlite).route);
+
+  // app.delete('/article/<id>', (Request request) => Response.ok('body'));
 
   var appPipelined = Pipeline()
       .addMiddleware(shelf.logRequests())

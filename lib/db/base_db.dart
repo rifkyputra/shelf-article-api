@@ -1,11 +1,23 @@
 abstract class BaseDbDriver {
-  String? get table => null;
+  Future select({
+    required covariant table,
+    covariant columns,
+    covariant where,
+  });
 
-  Future select({covariant columns});
+  Future insert({
+    required covariant table,
+    required covariant data,
+  });
 
-  Future insert({covariant data});
+  Future delete({
+    required covariant table,
+    covariant id,
+  });
 
-  Future delete({covariant id});
-
-  Future update({covariant id});
+  Future update({
+    required covariant table,
+    required covariant id,
+    required covariant data,
+  });
 }

@@ -1,10 +1,12 @@
 import 'package:coba_shelf/dao/base_dao.dart';
 import 'package:coba_shelf/db/base_db.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 class UserDao extends DriverHolder implements BaseDao {
   UserDao({required BaseDbDriver db}) : super(db: db);
 
-  static const tableName = 'users';
+  @override
+  String get tableName => 'users';
 
   @override
   BaseDbDriver get db => super.db;
@@ -15,14 +17,14 @@ class UserDao extends DriverHolder implements BaseDao {
   }
 
   @override
-  Future getAll() async {
-    final query = await db.select();
+  Future<List<Object>> getAll() async {
+    final ResultSet query = await db.select(table: tableName);
 
-    if (query == null || query.isNotEmpty) {
+    if (query.isEmpty) {
       return [];
     }
 
-    return query;
+    return query.toList();
   }
 
   @override
@@ -31,13 +33,23 @@ class UserDao extends DriverHolder implements BaseDao {
   }
 
   @override
-  Future insert({covariant data}) {
-    throw UnimplementedError();
+  Future insert({required Map<String, dynamic> data}) async {
+    await db.insert(table: tableName, data: data);
   }
 
   @override
-  Future updateById({covariant id}) {
-    throw UnimplementedError();
+  Future updateById({covariant id, data}) async {
+    await db.update(table: tableName, id: id, data: data);
+  }
+
+  Future getByEmail({required email, List? columns}) async {
+    final ResultSet query = await db.select(
+      table: tableName,
+      where: {'email': email},
+      columns: columns,
+    );
+
+    return query;
   }
 
   @override

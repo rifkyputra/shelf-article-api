@@ -5,37 +5,6 @@ import 'package:coba_shelf/utils/app_middleware.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
 import 'package:shelf/shelf.dart';
 
-Middleware authMiddleware(String key) {
-  final middleware = AppMiddleware(
-    transform: (Request request) {
-      final bearer = request.headers['Authorization'];
-      String token;
-      JwtClaim? jwt;
-
-      if (bearer != null && bearer.startsWith('Bearer ')) {
-        token = bearer.replaceAll('Bearer ', '');
-        try {
-          jwt = verifyJwtHS256Signature(token, key);
-        } on JwtException {
-          //
-        }
-      }
-      if (jwt == null) {
-        //
-      }
-
-      if (jwt!.expiry!.millisecondsSinceEpoch <
-          DateTime.now().millisecondsSinceEpoch) {}
-
-      return request.change(
-        context: {'token': jwt},
-      );
-    },
-  );
-
-  return middleware.use;
-}
-
 Middleware handleAuthentication(String key) {
   return (Handler handler) {
     return (Request request) {
